@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Multi-Scheme HE & CPU AI Platform v5.0</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+        .navbar-custom {
+            background-color: #111827;
+            border-bottom: 1px solid #1f2937;
+        }
+        .card-custom {
+            background-color: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            margin-bottom: 24px;
+        }
+        .card-header-custom {
+            background-color: #0b0f19;
+            border-bottom: 1px solid #1f2937;
+            font-weight: 600;
+            color: #60a5fa;
+            border-top-left-radius: 10px !important;
+            border-top-right-radius: 10px !important;
+        }
+        .btn-indigo {
+            background-color: #4f46e5;
+            color: #ffffff;
+            border: none;
+            font-weight: 600;
+        }
+        .btn-indigo:hover {
+            background-color: #4338ca;
+            color: #ffffff;
+        }
+        .result-box {
+            background-color: #0b0f19;
+            border: 1px solid #1f2937;
+            border-radius: 6px;
+            padding: 16px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+            color: #e5e7eb;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+        .text-blue { color: #60a5fa; }
+        .text-green { color: #34d399; }
+        .text-purple { color: #c084fc; }
+        .text-gold { color: #fbbf24; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-custom py-3">
+        <div class="container">
+            <a class="navbar-brand text-blue fw-bold fs-4" href="#">
+                🛡️ Enterprise Multi-Scheme HE Engine v5.0
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-success">● Docker Ready (Ubuntu 24.04)</span>
+                <span class="badge bg-primary">NIST/128-bit Security Autotuned</span>
+                <span class="badge bg-indigo text-white" style="background-color: #4f46e5;">Parallel CPU Accelerated</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <!-- Banner -->
+        <div class="card card-custom p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h5 class="text-blue mb-1">엔터프라이즈 멀티 스키마 동형암호 & 병렬 CPU 딥러닝 플랫폼</h5>
+                    <p class="text-secondary mb-0 small">4대 동형암호 표준 스키마(CKKS, BFV, TFHE, Paillier), 보안 레벨 검증, 노이즈 오토튜너 및 멀티스레드 병렬 가속을 제공합니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 1: Security Validation & Parallel CPU Acceleration (Improvements 1, 2, 3) -->
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card card-custom">
+                    <div class="card-header card-header-custom">
+                        🛡️ 개선점 1 & 3: 동형암호 보안 표준 검증 및 노이즈 오토튜너
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label text-secondary small">보안 레벨 (NIST Standard):</label>
+                                <select id="secLevelSelect" class="form-select bg-dark text-white border-secondary">
+                                    <option value="128_bit">128-bit Standard Security (권장)</option>
+                                    <option value="192_bit">192-bit High Security</option>
+                                    <option value="256_bit">256-bit Ultra High Security (양자내성)</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label text-secondary small">현재 노이즈 레벨 (Noise):</label>
+                                <input type="number" id="noiseVal" class="form-control bg-dark text-white border-secondary" value="12.5">
+                            </div>
+                        </div>
+                        <button onclick="validateSecurityLevel()" class="btn btn-indigo w-100 py-2">
+                            🔍 보안 컴플라이언스 및 노이즈 오토튜닝 검증
+                        </button>
+                        <div class="mt-3">
+                            <div id="secResult" class="result-box">
+                                <span class="text-muted">보안 레벨을 검증하고 노이즈 재스케일링 상태를 확인하세요.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card card-custom">
+                    <div class="card-header card-header-custom">
+                        ⚡ 개선점 2: 멀티스레드 CPU 병렬 추론 가속기
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label text-secondary small">모델 선택 (Model):</label>
+                                <select id="parallelModelSelect" class="form-select bg-dark text-white border-secondary">
+                                    <option value="mobilenet_v3">MobileNetV3-Lite (비전)</option>
+                                    <option value="minilm_quantized">MiniLM-Quantized (NLP)</option>
+                                    <option value="lightgbm_cpu">LightGBM-CPU (정형)</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label text-secondary small">CPU 워커 스레드 수 (Workers):</label>
+                                <input type="number" id="workerCount" class="form-control bg-dark text-white border-secondary" value="4">
+                            </div>
+                        </div>
+                        <button onclick="runParallelBenchmark()" class="btn btn-indigo w-100 py-2">
+                            🚀 병렬 CPU 멀티스레드 가속 벤치마크
+                        </button>
+                        <div class="mt-3">
+                            <div id="parallelResult" class="result-box">
+                                <span class="text-muted">멀티스레드 가속으로 초당 처리량(Throughput) 상승을 확인하세요.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: 4-Scheme Comparison Matrix -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-custom">
+                    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+                        <span>📊 4대 동형암호 표준 스키마(CKKS, BFV, TFHE, Paillier) 종합 비교 매트릭스</span>
+                        <button onclick="runMultiCompare()" class="btn btn-sm btn-outline-info">
+                            ⚡ 4대 스키마 동시 비교
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover table-bordered border-secondary align-middle small mb-0">
+                                <thead>
+                                    <tr class="table-active text-blue">
+                                        <th>스키마</th>
+                                        <th>표준 명세 및 특징</th>
+                                        <th>데이터 타입</th>
+                                        <th>예측/출력 결과</th>
+                                        <th>레이턴시</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="compareTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            '4대 스키마 동시 비교' 버튼을 눌러 비교 매트릭스를 확인하세요.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function validateSecurityLevel() {
+            const secLevel = document.getElementById('secLevelSelect').value;
+            const noise = Number(document.getElementById('noiseVal').value);
+
+            const res = await fetch('/api/v1/security/validate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({security_level: secLevel, noise_level: noise})
+            });
+            const data = await res.json();
+
+            document.getElementById('secResult').innerHTML = `
+                <div class="text-blue"><b>[${data.security_compliance.level_name}]</b></div>
+                • 다항식 차원(N): <span class="text-green">${data.security_compliance.poly_modulus_degree}</span><br>
+                • 허용 최대 log(Q): <span class="text-green">${data.security_compliance.max_allowed_log_q} bits</span><br>
+                • 표준 준수 여부: <span class="badge bg-success">COMPLIANT (표준 준수)</span><br>
+                <hr class="my-2 border-secondary">
+                • 노이즈 오토튜너 상태: <span class="text-gold">${data.noise_autotuner.status}</span><br>
+                • 오토튜닝 후 노이즈: <span class="text-green">${data.noise_autotuner.refreshed_noise}</span>
+            `;
+        }
+
+        async function runParallelBenchmark() {
+            const modelId = document.getElementById('parallelModelSelect').value;
+            const workers = Number(document.getElementById('workerCount').value);
+
+            const res = await fetch('/api/v1/parallel/benchmark', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({model_id: modelId, sample_count: 40, max_workers: workers})
+            });
+            const data = await res.json();
+
+            document.getElementById('parallelResult').innerHTML = `
+                <div class="text-blue"><b>[CPU 병렬 가속 결과 - ${data.model_id}]</b></div>
+                • 사용된 CPU 스레드 수: <span class="text-purple">${data.threads_used} Threads</span><br>
+                • 처리된 배치 샘플 수: <span class="text-gold">${data.batch_sample_count} Samples</span><br>
+                • <b>총 연산 소요시간</b>: <span class="text-green">${data.parallel_latency_ms} ms</span><br>
+                • <b>병렬 처리량(Throughput)</b>: <span class="text-blue fw-bold">${data.parallel_throughput_samples_per_sec} samp/sec</span>
+            `;
+        }
+
+        async function runMultiCompare() {
+            const res = await fetch('/api/v1/compare/schemes', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({task: 'lstm', target_id: 'sine_wave'})
+            });
+            const data = await res.json();
+
+            let rowsHtml = '';
+            data.scheme_comparison.forEach((s) => {
+                rowsHtml += `
+                    <tr>
+                        <td class="text-blue fw-bold">${s.scheme_id.toUpperCase()}</td>
+                        <td class="text-secondary">${s.scheme_name}</td>
+                        <td class="text-purple">${s.data_type}</td>
+                        <td class="text-green fw-bold">${s.prediction}</td>
+                        <td class="text-gold fw-bold">${s.latency_ms} ms</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('compareTableBody').innerHTML = rowsHtml;
+        }
+    </script>
+</body>
+</html>
