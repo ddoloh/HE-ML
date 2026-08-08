@@ -55,7 +55,7 @@ class ParallelBenchmarkRequest(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 async def serve_dashboard(request: Request):
     """Renders the Enhanced Production Web Dashboard."""
-    return templates.TemplateResponse(name="index.html", context={"request": request})
+    return templates.TemplateResponse(request=request, name="index.html",context={"request": request} )
 
 @app.get("/api/v1/health")
 async def health_check():
