@@ -29,15 +29,15 @@ def test_api():
             print("1. Healthcheck Response:", data)
             assert data["status"] == "healthy"
 
-        # 2. List Large Datasets
+        # 2. List Large Datasets (Over 100 datasets)
         req = urllib.request.Request(f"{base_url}/api/v1/train/large_datasets/list")
         with urllib.request.urlopen(req) as resp:
             data = json.loads(resp.read().decode())
-            print("\n2. Large Datasets List:", list(data["datasets"].keys()))
-            assert len(data["datasets"]) == 4
+            print(f"\n2. Large Datasets List Count: {len(data['datasets'])} datasets available.")
+            assert len(data["datasets"]) >= 100
 
         # 3. Start Large Dataset Training Job
-        payload = json.dumps({"dataset_id": "large_time_series", "model_type": "lstm", "epochs": 5, "n_samples": 2000}).encode()
+        payload = json.dumps({"dataset_id": "ts_dataset_001", "model_type": "lstm", "epochs": 5, "n_samples": 2000}).encode()
         req = urllib.request.Request(f"{base_url}/api/v1/train/large_dataset/start", data=payload, headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(req) as resp:
             data = json.loads(resp.read().decode())
@@ -61,15 +61,23 @@ def test_api():
             print("\n5. Checkpoint Export Response:", data["export_info"])
             assert data["status"] == "exported"
 
-        # 6. Dashboard UI GET /
+        # 6. Web UI Model Inference Test
+        payload = json.dumps({"job_id": job_id, "model_type": "lstm", "scheme_id": "ckks"}).encode()
+        req = urllib.request.Request(f"{base_url}/api/v1/inference/run", data=payload, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode())
+            print("\n6. Web Inference Output Response:", data)
+            assert data["status"] == "success"
+
+        # 7. Dashboard UI GET /
         req = urllib.request.Request(f"{base_url}/")
         with urllib.request.urlopen(req) as resp:
             html = resp.read().decode()
-            print(f"\n6. Web Dashboard HTML Response: Received {len(html)} bytes")
-            assert "Large Dataset AI Training" in html
+            print(f"\n7. Web Dashboard HTML Response: Received {len(html)} bytes")
+            assert "AI Model Training & Inference Platform" in html
 
         print("\n============================================================")
-        print("[ALL LARGE DATASET TRAINING ENDPOINTS & WEB UI VERIFIED 100%!]")
+        print("[ALL 100+ DATASETS & WEB UI TRAINING/INFERENCE ENDPOINTS VERIFIED 100%!]")
         print("============================================================")
 
     finally:
@@ -78,3 +86,4 @@ def test_api():
 
 if __name__ == "__main__":
     test_api()
+
