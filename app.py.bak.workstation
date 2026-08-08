@@ -1,7 +1,6 @@
 import sys
 import os
 import time
-import json
 import numpy as np
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -70,55 +69,6 @@ async def health_check():
         "supported_schemes": ["ckks", "bfv", "tfhe", "paillier"],
         "security_levels": ["128_bit", "192_bit", "256_bit"],
         "parallel_cpu_acceleration": "Enabled"
-    }
-
-
-@app.get("/api/v1/workstation/benchmark")
-async def workstation_benchmark():
-    """
-    Return the latest workstation benchmark results for the web dashboard.
-    Supports both results/workstation/benchmark.json and results/benchmark.json.
-    """
-    candidates = [
-        os.path.join(BASE_DIR, "results", "workstation", "benchmark.json"),
-        os.path.join(BASE_DIR, "results", "benchmark.json"),
-    ]
-
-    for path in candidates:
-        if os.path.exists(path):
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-
-                if isinstance(data, list):
-                    results = data
-                elif isinstance(data, dict):
-                    results = data.get("results", data.get("benchmarks", []))
-                else:
-                    results = []
-
-                return {
-                    "status": "success",
-                    "source": path,
-                    "count": len(results),
-                    "results": results,
-                }
-
-            except Exception as exc:
-                return JSONResponse(
-                    status_code=500,
-                    content={
-                        "status": "error",
-                        "error": f"Failed to read benchmark file: {exc}",
-                    },
-                )
-
-    return {
-        "status": "empty",
-        "source": None,
-        "count": 0,
-        "results": [],
-        "message": "No workstation benchmark results found.",
     }
 
 @app.get("/api/v1/schemes")

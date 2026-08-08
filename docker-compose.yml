@@ -8,6 +8,10 @@ services:
     container_name: he_ml_app
     ports:
       - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./results:/app/results
     environment:
       - PYTHONUNBUFFERED=1
       - VECTOR_DIM=32

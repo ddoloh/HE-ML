@@ -1,0 +1,527 @@
+*** Begin Patch
+*** Add File: dataset_registry.json
++{
++  "ett_m1": {
++    "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/ETTm1.csv",
++    "filename": "ETTm1.csv",
++    "target": "OT",
++    "category": "electricity",
++    "description": "Electricity Transformer Temperature, 15-minute sampling"
++  },
++  "ett_m2": {
++    "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/ETTm2.csv",
++    "filename": "ETTm2.csv",
++    "target": "OT",
++    "category": "electricity",
++    "description": "Electricity Transformer Temperature, 15-minute sampling"
++  },
++  "h2o": {
++    "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/h2o.csv",
++    "filename": "h2o.csv",
++    "target": null,
++    "category": "health",
++    "description": "Monthly Australian health-system corticosteroid expenditure"
++  },
++  "fuel_consumption": {
++    "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/consumos-combustibles-mensual.csv",
++    "filename": "fuel_consumption.csv",
++    "target": null,
++    "category": "energy",
++    "description": "Monthly fuel consumption in Spain"
++  },
++  "air_quality": {
++    "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/air_quality_valencia_no_missing.csv",
++    "filename": "air_quality_valencia_no_missing.csv",
++    "target": "pm2.5",
++    "category": "weather_environment",
++    "description": "Hourly air-quality measurements in Valencia"
++  },
++  "website_visits": {
++    "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/visitas_por_dia_web_cienciadedatos.csv",
++    "filename": "website_visits.csv",
++    "target": null,
++    "category": "web",
++    "description": "Daily website visits"
++  },
++  "bike_sharing": {
++    "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/bike_sharing_dataset_clean.csv",
++    "filename": "bike_sharing.csv",
++    "target": null,
++    "category": "transportation",
++    "description": "Hourly Washington DC bike-sharing demand"
++  },
++  "australia_tourism": {
++    "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/australia_tourism.csv",
++    "filename": "australia_tourism.csv",
++    "target": null,
++    "category": "tourism",
++    "description": "Quarterly Australian tourism demand"
++  },
++  "uk_daily_flights": {
++    "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/uk_daily_flights.csv",
++    "filename": "uk_daily_flights.csv",
++    "target": null,
++    "category": "transportation",
++    "description": "Daily UK flight counts"
++  },
++  "vic_electricity": {
++    "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/vic_electricity.csv",
++    "filename": "vic_electricity.csv",
++    "target": null,
++    "category": "electricity",
++    "description": "Half-hourly Victoria, Australia electricity demand"
++  }
++}
+*** Update File: workstation_train.py
+@@
+ import argparse
++import csv
+ import json
+ import os
+ import time
+@@
+ ROOT = Path(__file__).resolve().parent
+ DATA_DIR = ROOT / "data" / "real_datasets"
+ MODEL_DIR = ROOT / "models" / "workstation_lstm"
+ RESULT_DIR = ROOT / "results" / "workstation"
++REGISTRY_PATH = ROOT / "dataset_registry.json"
+ 
+-DATASETS: Dict[str, Dict[str, Any]] = {
+-    "ett_m1": {
+-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/ETTm1.csv",
+-        "filename": "ETTm1.csv",
+-        "target": "OT",
+-        "description": "Electricity Transformer Temperature, 15-minute sampling",
+-    },
+-    "ett_m2": {
+-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/ETTm2.csv",
+-        "filename": "ETTm2.csv",
+-        "target": "OT",
+-        "description": "Electricity Transformer Temperature, 15-minute sampling",
+-    },
+-    "h2o": {
+-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/h2o.csv",
+-        "filename": "h2o.csv",
+-        "target": None,
+-        "description": "Monthly Australian health-system corticosteroid expenditure",
+-    },
+-    "fuel_consumption": {
+-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/consumos-combustibles-mensual.csv",
+-        "filename": "fuel_consumption.csv",
+-        "target": None,
+-        "description": "Monthly fuel consumption in Spain",
+-    },
+-    "air_quality": {
+-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/air_quality_valencia_no_missing.csv",
+-        "filename": "air_quality_valencia_no_missing.csv",
+-        "target": "pm2.5",
+-        "description": "Hourly air-quality measurements in Valencia",
+-    },
+-    "website_visits": {
+-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/visitas_por_dia_web_cienciadedatos.csv",
+-        "filename": "website_visits.csv",
+-        "target": None,
+-        "description": "Daily website visits",
+-    },
+-    "bike_sharing": {
+-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/bike_sharing_dataset_clean.csv",
+-        "filename": "bike_sharing.csv",
+-        "target": None,
+-        "description": "Hourly Washington DC bike-sharing demand",
+-    },
+-    "australia_tourism": {
+-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/australia_tourism.csv",
+-        "filename": "australia_tourism.csv",
+-        "target": None,
+-        "description": "Quarterly Australian tourism demand",
+-    },
+-    "uk_daily_flights": {
+-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/uk_daily_flights.csv",
+-        "filename": "uk_daily_flights.csv",
+-        "target": None,
+-        "description": "Daily UK flight counts",
+-    },
+-    "vic_electricity": {
+-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/vic_electricity.csv",
+-        "filename": "vic_electricity.csv",
+-        "target": None,
+-        "description": "Half-hourly Victoria, Australia electricity demand",
+-    },
+-}
++def load_dataset_registry() -> Dict[str, Dict[str, Any]]:
++    if not REGISTRY_PATH.exists():
++        raise FileNotFoundError(f"Dataset registry not found: {REGISTRY_PATH}")
++    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
++
++
++DATASETS: Dict[str, Dict[str, Any]] = load_dataset_registry()
+@@
+-def metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, float]:
++def metrics(
++    y_true: np.ndarray,
++    y_pred: np.ndarray,
++    *,
++    scaler_min: float | None = None,
++    scaler_max: float | None = None,
++) -> dict[str, float]:
+     err = np.asarray(y_pred).reshape(-1) - np.asarray(y_true).reshape(-1)
++
++    raw_mae = float(np.mean(np.abs(err)))
++    raw_mse = float(np.mean(err ** 2))
++    raw_rmse = float(np.sqrt(raw_mse))
++
++    y_true_flat = np.asarray(y_true).reshape(-1)
++    ss_res = float(np.sum(err ** 2))
++    ss_tot = float(np.sum((y_true_flat - np.mean(y_true_flat)) ** 2))
++    r2 = float(1.0 - (ss_res / ss_tot)) if ss_tot > 0.0 else 0.0
++
++    if scaler_min is not None and scaler_max is not None:
++        normalization_range = float(scaler_max - scaler_min)
++    else:
++        normalization_range = float(
++            np.max(y_true_flat) - np.min(y_true_flat)
++        )
++
++    if normalization_range > 0.0:
++        normalized_mae = raw_mae / normalization_range
++        normalized_rmse = raw_rmse / normalization_range
++    else:
++        normalized_mae = 0.0
++        normalized_rmse = 0.0
++
+     return {
+-        "mae": float(np.mean(np.abs(err))),
+-        "mse": float(np.mean(err ** 2)),
+-        "rmse": float(np.sqrt(np.mean(err ** 2))),
++        "raw_mae": raw_mae,
++        "raw_mse": raw_mse,
++        "raw_rmse": raw_rmse,
++        "normalized_mae": float(normalized_mae),
++        "normalized_rmse": float(normalized_rmse),
++        "r2": r2,
++        "normalization_range": normalization_range,
++
++        # Backward-compatible aliases.
++        "mae": raw_mae,
++        "mse": raw_mse,
++        "rmse": raw_rmse,
+     }
+@@
+-    m = metrics(y_test, pred)
++    m = metrics(
++        y_test,
++        pred,
++        scaler_min=float(model.scaler_min),
++        scaler_max=float(model.scaler_max),
++    )
+ 
+     metadata = {
+         "dataset_id": dataset_id,
++        "category": DATASETS[dataset_id].get("category", "other"),
+         "target": target_col,
+@@
+-    (RESULT_DIR / f"{dataset_id}.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
++    (RESULT_DIR / f"{dataset_id}.json").write_text(
++        json.dumps(metadata, indent=2),
++        encoding="utf-8",
++    )
+@@
+ def benchmark(
+@@
+-    (RESULT_DIR / "benchmark.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
++    benchmark_json = RESULT_DIR / "benchmark.json"
++    benchmark_csv = RESULT_DIR / "benchmark.csv"
++
++    benchmark_json.write_text(
++        json.dumps(results, indent=2),
++        encoding="utf-8",
++    )
++
++    csv_fields = [
++        "dataset_id",
++        "category",
++        "target",
++        "points",
++        "seq_len",
++        "epochs",
++        "lr",
++        "train_windows",
++        "test_windows",
++        "train_seconds",
++        "raw_mae",
++        "raw_rmse",
++        "normalized_mae",
++        "normalized_rmse",
++        "r2",
++        "status",
++        "model_path",
++        "error",
++    ]
++
++    with benchmark_csv.open("w", newline="", encoding="utf-8") as f:
++        writer = csv.DictWriter(f, fieldnames=csv_fields)
++        writer.writeheader()
++
++        for item in results:
++            metric_data = item.get("metrics", {})
++
++            row = {
++                key: item.get(key, "")
++                for key in csv_fields
++            }
++
++            row["status"] = item.get("status", "ok")
++            row["raw_mae"] = metric_data.get("raw_mae", "")
++            row["raw_rmse"] = metric_data.get("raw_rmse", "")
++            row["normalized_mae"] = metric_data.get(
++                "normalized_mae",
++                "",
++            )
++            row["normalized_rmse"] = metric_data.get(
++                "normalized_rmse",
++                "",
++            )
++            row["r2"] = metric_data.get("r2", "")
++
++            writer.writerow(row)
++
++    print(f"[benchmark] JSON -> {benchmark_json}")
++    print(f"[benchmark] CSV  -> {benchmark_csv}")
++
+     return results
+*** Update File: app.py
+@@
+ @app.get("/api/v1/health")
+ async def health_check():
+@@
+     return {
+         "status": "healthy",
+         "service": "Multi-Scheme HE Engine v5.0 (Autotuned)",
+@@
+         "parallel_cpu_acceleration": "Enabled"
+     }
++
++
++@app.get("/api/v1/workstation/benchmark")
++async def workstation_benchmark():
++    """
++    Return the latest workstation benchmark generated by
++    workstation_train.py.
++    """
++    benchmark_path = os.path.join(
++        BASE_DIR,
++        "results",
++        "workstation",
++        "benchmark.json",
++    )
++
++    if not os.path.exists(benchmark_path):
++        return JSONResponse(
++            status_code=404,
++            content={
++                "status": "not_ready",
++                "message": (
++                    "Run workstation_train.py benchmark first."
++                ),
++                "results": [],
++            },
++        )
++
++    try:
++        import json
++
++        with open(
++            benchmark_path,
++            "r",
++            encoding="utf-8",
++        ) as f:
++            results = json.load(f)
++
++        return {
++            "status": "success",
++            "count": len(results),
++            "results": results,
++        }
++
++    except Exception as exc:
++        return JSONResponse(
++            status_code=500,
++            content={
++                "status": "error",
++                "message": repr(exc),
++                "results": [],
++            },
++        )
+*** Update File: templates/index.html
+@@
+     async function runMultiCompare() {
+         const res = await fetch('/api/v1/compare/schemes', {
+             method: 'POST',
+@@
+         });
+         document.getElementById('compareTableBody').innerHTML = rowsHtml;
+     }
++
++    async function loadWorkstationBenchmark() {
++        const body = document.getElementById(
++            'workstationBenchmarkBody'
++        );
++        const meta = document.getElementById(
++            'workstationBenchmarkMeta'
++        );
++
++        try {
++            const res = await fetch(
++                '/api/v1/workstation/benchmark',
++                {cache: 'no-store'}
++            );
++
++            const data = await res.json();
++
++            if (!res.ok || data.status !== 'success') {
++                body.innerHTML = `
++                    <tr>
++                        <td colspan="8"
++                            class="text-center text-muted py-4">
++                            아직 benchmark 결과가 없습니다.
++                            workstation_train.py benchmark를 먼저 실행하세요.
++                        </td>
++                    </tr>
++                `;
++                meta.textContent = 'Benchmark 결과 없음';
++                return;
++            }
++
++            const rows = data.results || [];
++            meta.textContent = `총 ${rows.length}개 데이터셋`;
++
++            body.innerHTML = rows.map((r) => {
++                if (r.status === 'error') {
++                    return `
++                        <tr>
++                            <td class="fw-bold">${r.dataset_id}</td>
++                            <td>${r.category || '-'}</td>
++                            <td colspan="6"
++                                class="text-danger">
++                                ERROR: ${r.error || 'unknown error'}
++                            </td>
++                        </tr>
++                    `;
++                }
++
++                const m = r.metrics || {};
++
++                return `
++                    <tr>
++                        <td class="text-blue fw-bold">
++                            ${r.dataset_id}
++                        </td>
++                        <td>${r.category || '-'}</td>
++                        <td>${r.points ?? '-'}</td>
++                        <td>
++                            ${Number(
++                                m.normalized_rmse ?? 0
++                            ).toFixed(4)}
++                        </td>
++                        <td>
++                            ${Number(
++                                m.normalized_mae ?? 0
++                            ).toFixed(4)}
++                        </td>
++                        <td>
++                            ${Number(
++                                m.r2 ?? 0
++                            ).toFixed(4)}
++                        </td>
++                        <td>
++                            ${Number(
++                                m.raw_rmse ?? 0
++                            ).toFixed(3)}
++                        </td>
++                        <td>
++                            ${Number(
++                                r.train_seconds ?? 0
++                            ).toFixed(2)} s
++                        </td>
++                    </tr>
++                `;
++            }).join('');
++
++        } catch (err) {
++            meta.textContent = 'Benchmark API 오류';
++            body.innerHTML = `
++                <tr>
++                    <td colspan="8"
++                        class="text-center text-danger py-4">
++                        Benchmark 결과를 불러오지 못했습니다:
++                        ${err}
++                    </td>
++                </tr>
++            `;
++        }
++    }
++
++    document.addEventListener(
++        'DOMContentLoaded',
++        loadWorkstationBenchmark
++    );
+ </script>
++
++<!-- Workstation benchmark: displayed at the bottom of the existing index page. -->
++<div class="container my-4">
++    <div class="card card-custom">
++        <div
++            class="card-header card-header-custom d-flex justify-content-between align-items-center"
++        >
++            <span>
++                📊 Workstation Time-Series Benchmark
++            </span>
++
++            <span
++                id="workstationBenchmarkMeta"
++                class="small text-secondary"
++            >
++                불러오는 중...
++            </span>
++        </div>
++
++        <div class="card-body">
++            <p class="text-secondary small mb-3">
++                데이터셋 원래 단위의 Raw RMSE/MAE와 함께
++                train range 기준 Normalized RMSE/MAE 및 R²를 표시합니다.
++                데이터셋 간 비교는 Normalized RMSE와 R²를 우선 사용하세요.
++            </p>
++
++            <div class="table-responsive">
++                <table
++                    class="table table-dark table-hover table-bordered border-secondary align-middle small mb-0"
++                >
++                    <thead>
++                        <tr class="table-active text-blue">
++                            <th>Dataset</th>
++                            <th>Category</th>
++                            <th>Points</th>
++                            <th>Norm RMSE ↓</th>
++                            <th>Norm MAE ↓</th>
++                            <th>R² ↑</th>
++                            <th>Raw RMSE</th>
++                            <th>Train Time</th>
++                        </tr>
++                    </thead>
++
++                    <tbody id="workstationBenchmarkBody">
++                        <tr>
++                            <td
++                                colspan="8"
++                                class="text-center text-muted py-4"
++                            >
++                                Benchmark 결과를 불러오는 중...
++                            </td>
++                        </tr>
++                    </tbody>
++                </table>
++            </div>
++        </div>
++    </div>
++</div>
+*** End Patch

@@ -1,0 +1,12 @@
+
+# Python / local environments
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.python-version
+
+# Workstation datasets / trained models / results
+data/real_datasets/
+models/workstation_lstm/
+results/workstation/
