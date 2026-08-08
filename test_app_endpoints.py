@@ -10,16 +10,16 @@ from app import app
 import uvicorn
 
 def run_server():
-    uvicorn.run(app, host="127.0.0.1", port=8009, log_level="error")
+    uvicorn.run(app, host="127.0.0.1", port=8011, log_level="error")
 
 def test_api():
-    print("[*] Starting Autotuned Multi-Scheme HE FastAPI Server on port 8009...")
+    print("[*] Starting Large Dataset AI Training FastAPI Server on port 8011...")
     proc = multiprocessing.Process(target=run_server)
     proc.start()
     
     time.sleep(2.5) # Wait for server startup
 
-    base_url = "http://127.0.0.1:8009"
+    base_url = "http://127.0.0.1:8011"
     
     try:
         # 1. Healthcheck
@@ -29,41 +29,47 @@ def test_api():
             print("1. Healthcheck Response:", data)
             assert data["status"] == "healthy"
 
-        # 2. Security Validation & Autotuner
-        payload = json.dumps({"security_level": "128_bit", "dim": 32, "scale": 1000000, "noise_level": 12.5}).encode()
-        req = urllib.request.Request(f"{base_url}/api/v1/security/validate", data=payload, headers={"Content-Type": "application/json"})
+        # 2. List Large Datasets
+        req = urllib.request.Request(f"{base_url}/api/v1/train/large_datasets/list")
         with urllib.request.urlopen(req) as resp:
             data = json.loads(resp.read().decode())
-            print("\n2. Security Validation Response:", data["security_compliance"]["level_name"], "Compliant:", data["security_compliance"]["is_standard_compliant"])
-            assert data["security_compliance"]["is_standard_compliant"] == True
+            print("\n2. Large Datasets List:", list(data["datasets"].keys()))
+            assert len(data["datasets"]) == 4
 
-        # 3. Parallel CPU Benchmark
-        payload = json.dumps({"model_id": "mobilenet_v3", "sample_count": 30, "max_workers": 4}).encode()
-        req = urllib.request.Request(f"{base_url}/api/v1/parallel/benchmark", data=payload, headers={"Content-Type": "application/json"})
+        # 3. Start Large Dataset Training Job
+        payload = json.dumps({"dataset_id": "large_time_series", "model_type": "lstm", "epochs": 5, "n_samples": 2000}).encode()
+        req = urllib.request.Request(f"{base_url}/api/v1/train/large_dataset/start", data=payload, headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(req) as resp:
             data = json.loads(resp.read().decode())
-            print("\n3. Parallel CPU Benchmark Response:", data["model_id"], "Throughput:", data["parallel_throughput_samples_per_sec"], "samp/s")
-            assert "parallel_throughput_samples_per_sec" in data
+            print("\n3. Large Training Start Response:", data)
+            job_id = data["job_id"]
+            assert data["status"] == "started"
 
-        # 4. 4-Scheme Comparison Matrix
-        payload = json.dumps({"task": "lstm", "target_id": "sine_wave"}).encode()
-        req = urllib.request.Request(f"{base_url}/api/v1/compare/schemes", data=payload, headers={"Content-Type": "application/json"})
+        # 4. Poll Training Status
+        time.sleep(1.0)
+        req = urllib.request.Request(f"{base_url}/api/v1/train/large_dataset/status/{job_id}")
         with urllib.request.urlopen(req) as resp:
             data = json.loads(resp.read().decode())
-            print(f"\n4. 4-Scheme Matrix Comparison ({len(data['scheme_comparison'])} schemes):")
-            for s in data["scheme_comparison"]:
-                print(f"   - {s['scheme_id'].upper():10s} | {s['scheme_name']:45s} | Pred: {s['prediction']}")
-            assert len(data["scheme_comparison"]) == 4
+            print("\n4. Training Progress Status:", f"Job: {data['job_id']}, Progress: {data['progress_pct']}%, Epoch: {data['current_epoch']}/{data['total_epochs']}")
+            assert "progress_pct" in data
 
-        # 5. Dashboard UI GET /
+        # 5. Export Model Checkpoint
+        payload = json.dumps({"job_id": job_id}).encode()
+        req = urllib.request.Request(f"{base_url}/api/v1/train/large_dataset/export/{job_id}", data=payload, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode())
+            print("\n5. Checkpoint Export Response:", data["export_info"])
+            assert data["status"] == "exported"
+
+        # 6. Dashboard UI GET /
         req = urllib.request.Request(f"{base_url}/")
         with urllib.request.urlopen(req) as resp:
             html = resp.read().decode()
-            print(f"\n5. Web Dashboard HTML Response: Received {len(html)} bytes")
-            assert "Enterprise Multi-Scheme HE Engine" in html
+            print(f"\n6. Web Dashboard HTML Response: Received {len(html)} bytes")
+            assert "Large Dataset AI Training" in html
 
         print("\n============================================================")
-        print("[ALL IMPROVEMENTS, ENDPOINTS & WEB UI VERIFIED 100%!]")
+        print("[ALL LARGE DATASET TRAINING ENDPOINTS & WEB UI VERIFIED 100%!]")
         print("============================================================")
 
     finally:

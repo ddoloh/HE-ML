@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Multi-Scheme HE & CPU AI Platform v5.0</title>
+    <title>Large-Scale Dataset AI Training & HE Engine v6.0</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -24,20 +24,20 @@
         }
         .card-header-custom {
             background-color: #0b0f19;
-            border-bottom: 1px solid #1f2937;
+            border-bottom: 1px solid #3a3f58;
             font-weight: 600;
-            color: #60a5fa;
+            color: #f43f5e;
             border-top-left-radius: 10px !important;
             border-top-right-radius: 10px !important;
         }
-        .btn-indigo {
-            background-color: #4f46e5;
+        .btn-rose {
+            background-color: #e11d48;
             color: #ffffff;
             border: none;
             font-weight: 600;
         }
-        .btn-indigo:hover {
-            background-color: #4338ca;
+        .btn-rose:hover {
+            background-color: #be123c;
             color: #ffffff;
         }
         .result-box {
@@ -50,6 +50,7 @@
             max-height: 320px;
             overflow-y: auto;
         }
+        .text-rose { color: #f43f5e; }
         .text-blue { color: #60a5fa; }
         .text-green { color: #34d399; }
         .text-purple { color: #c084fc; }
@@ -59,13 +60,13 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom py-3">
         <div class="container">
-            <a class="navbar-brand text-blue fw-bold fs-4" href="#">
-                🛡️ Enterprise Multi-Scheme HE Engine v5.0
+            <a class="navbar-brand text-rose fw-bold fs-4" href="#">
+                🏋️ Large Dataset AI Training & HE Engine v6.0
             </a>
             <div class="d-flex align-items-center gap-2">
                 <span class="badge bg-success">● Docker Ready (Ubuntu 24.04)</span>
-                <span class="badge bg-primary">NIST/128-bit Security Autotuned</span>
-                <span class="badge bg-indigo text-white" style="background-color: #4f46e5;">Parallel CPU Accelerated</span>
+                <span class="badge bg-danger">10k-100k Dataset Trainer</span>
+                <span class="badge bg-primary">4 Standard HE Schemes</span>
             </div>
         </div>
     </nav>
@@ -75,72 +76,70 @@
         <div class="card card-custom p-3 mb-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <h5 class="text-blue mb-1">엔터프라이즈 멀티 스키마 동형암호 & 병렬 CPU 딥러닝 플랫폼</h5>
-                    <p class="text-secondary mb-0 small">4대 동형암호 표준 스키마(CKKS, BFV, TFHE, Paillier), 보안 레벨 검증, 노이즈 오토튜너 및 멀티스레드 병렬 가속을 제공합니다.</p>
+                    <h5 class="text-rose mb-1">대용량 데이터셋(10,000 ~ 100,000개 샘플) 비동기 모델 학습 대시보드</h5>
+                    <p class="text-secondary mb-0 small">대용량 시계열, 금융 정형, NLP 코퍼스 데이터셋에 대해 비동기 백그라운드 모델 학습, 프로그래스 모니터링 및 체크포인트를 저장합니다.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Row 1: Security Validation & Parallel CPU Acceleration (Improvements 1, 2, 3) -->
+        <!-- Section 1: Large Dataset Model Training (New Major Feature) -->
         <div class="row">
             <div class="col-lg-6">
                 <div class="card card-custom">
-                    <div class="card-header card-header-custom">
-                        🛡️ 개선점 1 & 3: 동형암호 보안 표준 검증 및 노이즈 오토튜너
+                    <div class="card-header card-header-custom text-rose">
+                        🏋️ 대용량 데이터셋 모델 학습 시작 (Large Dataset Training)
                     </div>
                     <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small">대용량 데이터셋 선택 (Select Large Dataset):</label>
+                            <select id="largeDatasetSelect" class="form-select bg-dark text-white border-secondary">
+                                <option value="large_time_series">1. Large Smart Grid Time-Series (50,000개 시계열 샘플)</option>
+                                <option value="large_tabular_credit">2. Large Financial Credit Risk (20,000개 금융 정형)</option>
+                                <option value="large_text_intent">3. Large NLP Intent Corpus (10,000개 텍스트 코퍼스)</option>
+                                <option value="large_vision_objects">4. Large Visual Surface Dataset (10,000개 이미지 벡터)</option>
+                            </select>
+                        </div>
+
                         <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <label class="form-label text-secondary small">보안 레벨 (NIST Standard):</label>
-                                <select id="secLevelSelect" class="form-select bg-dark text-white border-secondary">
-                                    <option value="128_bit">128-bit Standard Security (권장)</option>
-                                    <option value="192_bit">192-bit High Security</option>
-                                    <option value="256_bit">256-bit Ultra High Security (양자내성)</option>
-                                </select>
+                            <div class="col-4">
+                                <label class="form-label text-secondary small">샘플 수 (Samples):</label>
+                                <input type="number" id="largeSamples" class="form-control bg-dark text-white border-secondary" value="10000">
                             </div>
-                            <div class="col-6">
-                                <label class="form-label text-secondary small">현재 노이즈 레벨 (Noise):</label>
-                                <input type="number" id="noiseVal" class="form-control bg-dark text-white border-secondary" value="12.5">
+                            <div class="col-4">
+                                <label class="form-label text-secondary small">학습 횟수(Epochs):</label>
+                                <input type="number" id="largeEpochs" class="form-control bg-dark text-white border-secondary" value="25">
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label text-secondary small">학습률 (LR):</label>
+                                <input type="number" id="largeLr" class="form-control bg-dark text-white border-secondary" value="0.03" step="0.01">
                             </div>
                         </div>
-                        <button onclick="validateSecurityLevel()" class="btn btn-indigo w-100 py-2">
-                            🔍 보안 컴플라이언스 및 노이즈 오토튜닝 검증
+
+                        <button onclick="startLargeTraining()" class="btn btn-rose w-100 py-2">
+                            🚀 대용량 데이터셋 비동기 학습 시작
                         </button>
-                        <div class="mt-3">
-                            <div id="secResult" class="result-box">
-                                <span class="text-muted">보안 레벨을 검증하고 노이즈 재스케일링 상태를 확인하세요.</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Training Progress & Monitor -->
             <div class="col-lg-6">
                 <div class="card card-custom">
-                    <div class="card-header card-header-custom">
-                        ⚡ 개선점 2: 멀티스레드 CPU 병렬 추론 가속기
+                    <div class="card-header card-header-custom text-rose">
+                        📈 실시간 학습 진척도 & Loss 모니터 (Live Monitor)
                     </div>
                     <div class="card-body">
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <label class="form-label text-secondary small">모델 선택 (Model):</label>
-                                <select id="parallelModelSelect" class="form-select bg-dark text-white border-secondary">
-                                    <option value="mobilenet_v3">MobileNetV3-Lite (비전)</option>
-                                    <option value="minilm_quantized">MiniLM-Quantized (NLP)</option>
-                                    <option value="lightgbm_cpu">LightGBM-CPU (정형)</option>
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label text-secondary small">CPU 워커 스레드 수 (Workers):</label>
-                                <input type="number" id="workerCount" class="form-control bg-dark text-white border-secondary" value="4">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small">학습 진척도 (Progress %):</label>
+                            <div class="progress bg-dark border border-secondary mb-2" style="height: 24px;">
+                                <div id="trainingProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-rose" style="width: 0%;">0%</div>
                             </div>
                         </div>
-                        <button onclick="runParallelBenchmark()" class="btn btn-indigo w-100 py-2">
-                            🚀 병렬 CPU 멀티스레드 가속 벤치마크
-                        </button>
-                        <div class="mt-3">
-                            <div id="parallelResult" class="result-box">
-                                <span class="text-muted">멀티스레드 가속으로 초당 처리량(Throughput) 상승을 확인하세요.</span>
+
+                        <div>
+                            <label class="form-label text-secondary small">학습 상태 및 체크포인트:</label>
+                            <div id="trainingMonitorBox" class="result-box">
+                                <span class="text-muted">학습을 시작하면 에포크별 Loss 수렴 상태와 체크포인트 저장이 출력됩니다.</span>
                             </div>
                         </div>
                     </div>
@@ -148,14 +147,14 @@
             </div>
         </div>
 
-        <!-- Row 2: 4-Scheme Comparison Matrix -->
+        <!-- Section 2: Multi-Scheme Comparison Matrix -->
         <div class="row">
             <div class="col-12">
                 <div class="card card-custom">
-                    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-                        <span>📊 4대 동형암호 표준 스키마(CKKS, BFV, TFHE, Paillier) 종합 비교 매트릭스</span>
+                    <div class="card-header card-header-custom text-blue d-flex justify-content-between align-items-center">
+                        <span>📊 4대 표준 동형암호 스키마(CKKS, BFV, TFHE, Paillier) 비교 매트릭스</span>
                         <button onclick="runMultiCompare()" class="btn btn-sm btn-outline-info">
-                            ⚡ 4대 스키마 동시 비교
+                            ⚡ 4대 스키마 비교
                         </button>
                     </div>
                     <div class="card-body">
@@ -173,7 +172,7 @@
                                 <tbody id="compareTableBody">
                                     <tr>
                                         <td colspan="5" class="text-center text-muted py-4">
-                                            '4대 스키마 동시 비교' 버튼을 눌러 비교 매트릭스를 확인하세요.
+                                            '4대 스키마 비교' 버튼을 눌러 비교 매트릭스를 확인하세요.
                                         </td>
                                     </tr>
                                 </tbody>
@@ -186,96 +185,73 @@
     </div>
 
     <script>
+        let currentJobId = null;
+        let pollTimer = null;
 
-    async function loadWorkstationCatalog() {
-        const result = document.getElementById('workstationCatalogResult');
-        const body = document.getElementById('workstationCatalogBody');
+        async function startLargeTraining() {
+            const datasetId = document.getElementById('largeDatasetSelect').value;
+            const nSamples = Number(document.getElementById('largeSamples').value);
+            const epochs = Number(document.getElementById('largeEpochs').value);
+            const lr = Number(document.getElementById('largeLr').value);
 
-        try {
-            const res = await fetch('/api/v1/workstation/catalog');
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status}`);
-            }
-
-            const data = await res.json();
-
-            result.innerHTML =
-                `<b>등록된 workstation dataset:</b> ${data.count}개`;
-
-            if (!data.datasets || data.datasets.length === 0) {
-                body.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="text-center text-muted py-4">
-                            등록된 dataset이 없습니다.
-                        </td>
-                    </tr>`;
-                return;
-            }
-
-            body.innerHTML = data.datasets.map(d => `
-                <tr>
-                    <td class="text-blue fw-bold">${d.dataset_id}</td>
-                    <td class="text-secondary">${d.description || '-'}</td>
-                    <td class="text-purple">${d.target || 'auto'}</td>
-                    <td class="text-gold">${d.source || '-'}</td>
-                </tr>
-            `).join('');
-        } catch (err) {
-            result.innerHTML =
-                `<span class="text-danger">Dataset catalog를 불러오지 못했습니다: ${String(err)}</span>`;
-
-            body.innerHTML = `
-                <tr>
-                    <td colspan="4" class="text-center text-danger py-4">
-                        ${String(err)}
-                    </td>
-                </tr>`;
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', loadWorkstationCatalog);
-
-
-        async function validateSecurityLevel() {
-            const secLevel = document.getElementById('secLevelSelect').value;
-            const noise = Number(document.getElementById('noiseVal').value);
-
-            const res = await fetch('/api/v1/security/validate', {
+            const res = await fetch('/api/v1/train/large_dataset/start', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({security_level: secLevel, noise_level: noise})
+                body: JSON.stringify({
+                    dataset_id: datasetId,
+                    model_type: 'lstm',
+                    n_samples: nSamples,
+                    epochs: epochs,
+                    lr: lr
+                })
             });
             const data = await res.json();
+            currentJobId = data.job_id;
 
-            document.getElementById('secResult').innerHTML = `
-                <div class="text-blue"><b>[${data.security_compliance.level_name}]</b></div>
-                • 다항식 차원(N): <span class="text-green">${data.security_compliance.poly_modulus_degree}</span><br>
-                • 허용 최대 log(Q): <span class="text-green">${data.security_compliance.max_allowed_log_q} bits</span><br>
-                • 표준 준수 여부: <span class="badge bg-success">COMPLIANT (표준 준수)</span><br>
-                <hr class="my-2 border-secondary">
-                • 노이즈 오토튜너 상태: <span class="text-gold">${data.noise_autotuner.status}</span><br>
-                • 오토튜닝 후 노이즈: <span class="text-green">${data.noise_autotuner.refreshed_noise}</span>
-            `;
+            document.getElementById('trainingMonitorBox').innerHTML = `<div class="text-rose"><b>[학습 작업 시작] Job ID: ${currentJobId}</b></div>데이터 로딩 및 비동기 스레드 학습 진행 중...`;
+
+            if (pollTimer) clearInterval(pollTimer);
+            pollTimer = setInterval(pollTrainingStatus, 600);
         }
 
-        async function runParallelBenchmark() {
-            const modelId = document.getElementById('parallelModelSelect').value;
-            const workers = Number(document.getElementById('workerCount').value);
+        async function pollTrainingStatus() {
+            if (!currentJobId) return;
 
-            const res = await fetch('/api/v1/parallel/benchmark', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({model_id: modelId, sample_count: 40, max_workers: workers})
-            });
+            const res = await fetch('/api/v1/train/large_dataset/status/' + currentJobId);
             const data = await res.json();
 
-            document.getElementById('parallelResult').innerHTML = `
-                <div class="text-blue"><b>[CPU 병렬 가속 결과 - ${data.model_id}]</b></div>
-                • 사용된 CPU 스레드 수: <span class="text-purple">${data.threads_used} Threads</span><br>
-                • 처리된 배치 샘플 수: <span class="text-gold">${data.batch_sample_count} Samples</span><br>
-                • <b>총 연산 소요시간</b>: <span class="text-green">${data.parallel_latency_ms} ms</span><br>
-                • <b>병렬 처리량(Throughput)</b>: <span class="text-blue fw-bold">${data.parallel_throughput_samples_per_sec} samp/sec</span>
-            `;
+            const pBar = document.getElementById('trainingProgressBar');
+            pBar.style.width = data.progress_pct + '%';
+            pBar.innerText = data.progress_pct + '%';
+
+            let lossDisplay = data.train_loss_history && data.train_loss_history.length > 0 
+                ? data.train_loss_history[data.train_loss_history.length - 1] : '계산 중...';
+
+            let html = `<div class="text-rose"><b>[학습 작업: ${data.job_id}]</b></div>`;
+            html += `• 상태(Status): <span class="text-gold">${data.status.toUpperCase()}</span><br>`;
+            html += `• 진행 에포크: <span class="text-green">${data.current_epoch} / ${data.total_epochs}</span><br>`;
+            html += `• 현재 Train Loss: <span class="text-teal">${lossDisplay}</span><br>`;
+            html += `• 경과 시간: <span class="text-cyan">${data.elapsed_sec} 초</span><br>`;
+
+            if (data.status === 'completed') {
+                clearInterval(pollTimer);
+                pBar.className = 'progress-bar bg-success';
+                html += `<hr class="my-2 border-secondary">• <b>최종 검증 Loss(Val Loss)</b>: <span class="text-green fw-bold">${data.val_loss}</span><br>`;
+                html += `<button onclick="exportCheckpoint()" class="btn btn-sm btn-outline-success mt-2">💾 체크포인트 가중치(.npz) 저장</button>`;
+            }
+
+            document.getElementById('trainingMonitorBox').innerHTML = html;
+        }
+
+        async function exportCheckpoint() {
+            if (!currentJobId) return;
+            const res = await fetch('/api/v1/train/large_dataset/export/' + currentJobId, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({job_id: currentJobId})
+            });
+            const data = await res.json();
+            alert('가중치 체크포인트가 저장되었습니다: ' + data.export_info.weights_path);
         }
 
         async function runMultiCompare() {
@@ -303,373 +279,3 @@
     </script>
 </body>
 </html>
-
-
-<!-- ============================================================
-     Workstation LSTM Benchmark
-     ============================================================ -->
-<div class="container my-4">
-    <div class="card card-custom">
-        <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-            <span>🧪 Workstation LSTM Benchmark</span>
-
-            <button
-                onclick="loadWorkstationBenchmark()"
-                class="btn btn-sm btn-outline-info">
-                🔄 새로고침
-            </button>
-        </div>
-
-        <div class="card-body">
-
-            <div class="mb-3">
-                <div class="text-secondary small">
-                    실제 시계열 데이터셋 workstation LSTM benchmark
-                </div>
-
-                <div
-                    id="workstationBenchmarkStatus"
-                    class="text-muted small mt-1">
-                    결과를 불러오는 중...
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-dark table-hover table-bordered border-secondary align-middle small mb-0">
-
-                    <thead>
-                        <tr class="table-active text-blue">
-                            <th>Dataset</th>
-                            <th>Target</th>
-                            <th>Points</th>
-                            <th>Seq</th>
-                            <th>Epochs</th>
-                            <th>Raw MAE</th>
-                            <th>Raw RMSE</th>
-                            <th>Norm MAE</th>
-                            <th>Norm RMSE</th>
-                            <th>R²</th>
-                            <th>Train</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="workstationBenchmarkBody">
-                        <tr>
-                            <td colspan="11"
-                                class="text-center text-muted py-4">
-                                Workstation benchmark 결과를 불러오는 중입니다.
-                            </td>
-                        </tr>
-                    </tbody>
-
-                </table>
-            </div>
-
-            <div class="mt-3 small text-secondary">
-                Raw MAE/RMSE는 원래 데이터 scale이며,
-                Normalized MAE/RMSE와 R²는 dataset 간 비교용 지표입니다.
-            </div>
-
-        </div>
-    </div>
-</div>
-
-    <!-- Workstation Dataset Catalog / Benchmark -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card card-custom">
-                <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-                    <span>🧪 Workstation LSTM Dataset Benchmark</span>
-                    <button onclick="loadWorkstationCatalog()" class="btn btn-sm btn-outline-info">
-                        🔄 Dataset 목록 새로고침
-                    </button>
-                </div>
-                <div class="card-body">
-                    <div id="workstationCatalogResult" class="result-box mb-3">
-                        <span class="text-muted">
-                            Workstation benchmark dataset catalog를 불러오는 중입니다.
-                        </span>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-dark table-hover table-bordered border-secondary align-middle small mb-0">
-                            <thead>
-                                <tr class="table-active text-blue">
-                                    <th>Dataset</th>
-                                    <th>Description</th>
-                                    <th>Target</th>
-                                    <th>Source</th>
-                                </tr>
-                            </thead>
-                            <tbody id="workstationCatalogBody">
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">
-                                        Loading...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-<script>
-function wbNumber(value, digits = 4) {
-    if (
-        value === null ||
-        value === undefined ||
-        value === "" ||
-        !Number.isFinite(Number(value))
-    ) {
-        return "-";
-    }
-
-    return Number(value).toLocaleString(undefined, {
-        maximumFractionDigits: digits
-    });
-}
-
-function wbMetric(item, metrics, names) {
-    for (const name of names) {
-        if (item[name] !== undefined && item[name] !== null) {
-            return item[name];
-        }
-
-        if (metrics[name] !== undefined && metrics[name] !== null) {
-            return metrics[name];
-        }
-    }
-
-    return null;
-}
-
-async function loadWorkstationBenchmark() {
-    const body =
-        document.getElementById("workstationBenchmarkBody");
-
-    const status =
-        document.getElementById("workstationBenchmarkStatus");
-
-    if (!body || !status) {
-        return;
-    }
-
-    body.innerHTML = `
-        <tr>
-            <td colspan="11"
-                class="text-center text-muted py-4">
-                benchmark 결과를 불러오는 중...
-            </td>
-        </tr>
-    `;
-
-    try {
-        const response = await fetch(
-            "/api/v1/workstation/benchmark",
-            {
-                cache: "no-store"
-            }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(
-                data.error ||
-                data.detail ||
-                "HTTP " + response.status
-            );
-        }
-
-        const results =
-            Array.isArray(data.results)
-                ? data.results
-                : [];
-
-        if (results.length === 0) {
-            body.innerHTML = `
-                <tr>
-                    <td colspan="11"
-                        class="text-center text-muted py-4">
-                        아직 benchmark 결과가 없습니다.<br>
-                        <code>
-                        python workstation_train.py benchmark --datasets all --epochs 3 --max-points 1500 --seq-len 24
-                        </code>
-                    </td>
-                </tr>
-            `;
-
-            status.textContent =
-                "Benchmark 결과 없음";
-
-            return;
-        }
-
-        let html = "";
-
-        for (const item of results) {
-
-            if (item.status === "error") {
-
-                html += `
-                    <tr>
-                        <td class="text-warning fw-bold">
-                            ${item.dataset_id || "-"}
-                        </td>
-
-                        <td colspan="9"
-                            class="text-danger">
-                            ${item.error || "benchmark error"}
-                        </td>
-
-                        <td>-</td>
-                    </tr>
-                `;
-
-                continue;
-            }
-
-            const metrics =
-                item.metrics || {};
-
-            const rawMae = wbMetric(
-                item,
-                metrics,
-                [
-                    "raw_mae",
-                    "mae"
-                ]
-            );
-
-            const rawRmse = wbMetric(
-                item,
-                metrics,
-                [
-                    "raw_rmse",
-                    "rmse"
-                ]
-            );
-
-            const normalizedMae = wbMetric(
-                item,
-                metrics,
-                [
-                    "normalized_mae",
-                    "nmae",
-                    "norm_mae"
-                ]
-            );
-
-            const normalizedRmse = wbMetric(
-                item,
-                metrics,
-                [
-                    "normalized_rmse",
-                    "nrmse",
-                    "norm_rmse"
-                ]
-            );
-
-            const r2 = wbMetric(
-                item,
-                metrics,
-                [
-                    "r2",
-                    "R2",
-                    "r_squared"
-                ]
-            );
-
-            html += `
-                <tr>
-
-                    <td class="text-blue fw-bold">
-                        ${item.dataset_id || "-"}
-                    </td>
-
-                    <td>
-                        ${item.target || "-"}
-                    </td>
-
-                    <td>
-                        ${wbNumber(item.points, 0)}
-                    </td>
-
-                    <td>
-                        ${wbNumber(item.seq_len, 0)}
-                    </td>
-
-                    <td>
-                        ${wbNumber(item.epochs, 0)}
-                    </td>
-
-                    <td>
-                        ${wbNumber(rawMae)}
-                    </td>
-
-                    <td>
-                        ${wbNumber(rawRmse)}
-                    </td>
-
-                    <td class="text-green fw-bold">
-                        ${wbNumber(normalizedMae)}
-                    </td>
-
-                    <td class="text-green fw-bold">
-                        ${wbNumber(normalizedRmse)}
-                    </td>
-
-                    <td class="text-gold fw-bold">
-                        ${wbNumber(r2)}
-                    </td>
-
-                    <td>
-                        ${wbNumber(item.train_seconds, 2)} s
-                    </td>
-
-                </tr>
-            `;
-        }
-
-        body.innerHTML = html;
-
-        status.textContent =
-            `${results.length}개 dataset benchmark`;
-
-    } catch (error) {
-
-        console.error(
-            "Workstation benchmark load failed:",
-            error
-        );
-
-        body.innerHTML = `
-            <tr>
-                <td colspan="11"
-                    class="text-center text-danger py-4">
-
-                    Benchmark 결과를 불러오지 못했습니다.
-
-                    <div class="small mt-2">
-                        ${error.message}
-                    </div>
-
-                </td>
-            </tr>
-        `;
-
-        status.textContent =
-            "Benchmark 로딩 실패";
-    }
-}
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-        loadWorkstationBenchmark();
-    }
-);
-</script>
-
