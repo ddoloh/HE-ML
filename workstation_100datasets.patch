@@ -1,0 +1,252 @@
+diff --git a/app.py b/app.py
+index 50a69d3..6dd22b7 100755
+--- a/app.py
++++ b/app.py
+@@ -20,6 +20,7 @@ from multi_scheme_he import (
+     CPUParallelInferenceEngine
+ )
+ from cpu_models_pkg import MobileNetV3Lite, MiniLMQuantized, LightGBMCPU
++from workstation_train import all_dataset_catalog
+ 
+ app = FastAPI(
+     title="Multi-Scheme HE & CPU AI Engine (Production Enterprise Edition)",
+@@ -61,6 +62,26 @@ async def serve_dashboard(request: Request):
+     name="index.html",
+     context={"request": request})
+ 
++
++@app.get("/api/v1/workstation/catalog")
++async def workstation_catalog():
++    """Return the workstation benchmark dataset catalog."""
++    catalog = all_dataset_catalog()
++    return {
++        "status": "success",
++        "count": len(catalog),
++        "datasets": [
++            {
++                "dataset_id": dataset_id,
++                "description": cfg.get("description", ""),
++                "target": cfg.get("target"),
++                "source": cfg.get("source", "core"),
++            }
++            for dataset_id, cfg in catalog.items()
++        ],
++    }
++
++
+ @app.get("/api/v1/health")
+ async def health_check():
+     """Healthcheck endpoint for container status."""
+diff --git a/templates/index.html b/templates/index.html
+index df1ea94..f6832d7 100755
+--- a/templates/index.html
++++ b/templates/index.html
+@@ -186,6 +186,56 @@
+     </div>
+ 
+     <script>
++
++    async function loadWorkstationCatalog() {
++        const result = document.getElementById('workstationCatalogResult');
++        const body = document.getElementById('workstationCatalogBody');
++
++        try {
++            const res = await fetch('/api/v1/workstation/catalog');
++            if (!res.ok) {
++                throw new Error(`HTTP ${res.status}`);
++            }
++
++            const data = await res.json();
++
++            result.innerHTML =
++                `<b>등록된 workstation dataset:</b> ${data.count}개`;
++
++            if (!data.datasets || data.datasets.length === 0) {
++                body.innerHTML = `
++                    <tr>
++                        <td colspan="4" class="text-center text-muted py-4">
++                            등록된 dataset이 없습니다.
++                        </td>
++                    </tr>`;
++                return;
++            }
++
++            body.innerHTML = data.datasets.map(d => `
++                <tr>
++                    <td class="text-blue fw-bold">${d.dataset_id}</td>
++                    <td class="text-secondary">${d.description || '-'}</td>
++                    <td class="text-purple">${d.target || 'auto'}</td>
++                    <td class="text-gold">${d.source || '-'}</td>
++                </tr>
++            `).join('');
++        } catch (err) {
++            result.innerHTML =
++                `<span class="text-danger">Dataset catalog를 불러오지 못했습니다: ${String(err)}</span>`;
++
++            body.innerHTML = `
++                <tr>
++                    <td colspan="4" class="text-center text-danger py-4">
++                        ${String(err)}
++                    </td>
++                </tr>`;
++        }
++    }
++
++    document.addEventListener('DOMContentLoaded', loadWorkstationCatalog);
++
++
+         async function validateSecurityLevel() {
+             const secLevel = document.getElementById('secLevelSelect').value;
+             const noise = Number(document.getElementById('noiseVal').value);
+@@ -324,6 +374,47 @@
+     </div>
+ </div>
+ 
++    <!-- Workstation Dataset Catalog / Benchmark -->
++    <div class="row mt-4">
++        <div class="col-12">
++            <div class="card card-custom">
++                <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
++                    <span>🧪 Workstation LSTM Dataset Benchmark</span>
++                    <button onclick="loadWorkstationCatalog()" class="btn btn-sm btn-outline-info">
++                        🔄 Dataset 목록 새로고침
++                    </button>
++                </div>
++                <div class="card-body">
++                    <div id="workstationCatalogResult" class="result-box mb-3">
++                        <span class="text-muted">
++                            Workstation benchmark dataset catalog를 불러오는 중입니다.
++                        </span>
++                    </div>
++
++                    <div class="table-responsive">
++                        <table class="table table-dark table-hover table-bordered border-secondary align-middle small mb-0">
++                            <thead>
++                                <tr class="table-active text-blue">
++                                    <th>Dataset</th>
++                                    <th>Description</th>
++                                    <th>Target</th>
++                                    <th>Source</th>
++                                </tr>
++                            </thead>
++                            <tbody id="workstationCatalogBody">
++                                <tr>
++                                    <td colspan="4" class="text-center text-muted py-4">
++                                        Loading...
++                                    </td>
++                                </tr>
++                            </tbody>
++                        </table>
++                    </div>
++                </div>
++            </div>
++        </div>
++    </div>
++
+ <script>
+ function wbNumber(value, digits = 4) {
+     if (
+diff --git a/workstation_train.py b/workstation_train.py
+index 7e3cb12..e9b197e 100644
+--- a/workstation_train.py
++++ b/workstation_train.py
+@@ -100,6 +100,37 @@ DATASETS: Dict[str, Dict[str, Any]] = {
+     },
+ }
+ 
++
++# ---------------------------------------------------------------------------
++# Extended workstation benchmark catalog
++#
++# The original DATASETS entries remain untouched.  These additional datasets
++# use the same generic CSV -> numeric target -> sequence-window pipeline.
++# Entries whose URL is unavailable are skipped by `catalog`; benchmark only
++# runs datasets that have successfully downloaded.
++# ---------------------------------------------------------------------------
++
++EXTENDED_DATASETS: Dict[str, Dict[str, Any]] = {
++    "air_passengers": {
++        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/air_passengers.csv",
++        "filename": "air_passengers.csv",
++        "target": None,
++        "description": "Monthly air passengers",
++    },
++    "fuel_consumption": {
++        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/consumos-combustibles-mensual.csv",
++        "filename": "fuel_consumption.csv",
++        "target": None,
++        "description": "Monthly fuel consumption",
++    },
++    "h2o_extended": {
++        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/h2o.csv",
++        "filename": "h2o_extended.csv",
++        "target": None,
++        "description": "Australian health expenditure",
++    },
++}
++
+ TARGET_ALIASES = {
+     "h2o": ["y", "value", "x", "h2o"],
+     "fuel_consumption": ["Consumo", "consumo", "value"],
+@@ -350,8 +381,36 @@ def benchmark(
+     return results
+ 
+ 
++
++def all_dataset_catalog() -> dict[str, dict[str, Any]]:
++    """Return the complete workstation dataset catalog."""
++    catalog: dict[str, dict[str, Any]] = {}
++    for dataset_id, cfg in DATASETS.items():
++        catalog[dataset_id] = dict(cfg, source="core")
++    for dataset_id, cfg in EXTENDED_DATASETS.items():
++        catalog.setdefault(dataset_id, dict(cfg, source="extended"))
++    return catalog
++
++
++def catalog() -> list[dict[str, Any]]:
++    """Print a machine-readable dataset catalog."""
++    rows = []
++    for dataset_id, cfg in all_dataset_catalog().items():
++        rows.append({
++            "dataset_id": dataset_id,
++            "description": cfg.get("description", ""),
++            "target": cfg.get("target"),
++            "filename": cfg.get("filename"),
++            "source": cfg.get("source", "core"),
++            "url": cfg.get("url"),
++        })
++    print(json.dumps(rows, indent=2, ensure_ascii=False))
++    return rows
++
++
+ def build_parser() -> argparse.ArgumentParser:
+     p = argparse.ArgumentParser(description="HE-ML workstation dataset/training/inference tool")
++    c = sub.add_parser("catalog", help="Show workstation dataset catalog")
+     sub = p.add_subparsers(dest="command", required=True)
+ 
+     d = sub.add_parser("download")
+@@ -387,7 +446,10 @@ def main() -> None:
+     args = build_parser().parse_args()
+     ensure_dirs()
+ 
+-    if args.command == "download":
++    if args.command == "catalog":
++        catalog()
++
++    elif args.command == "download":
+         if args.dataset == "all":
+             download_all(force=args.force)
+         else:
+@@ -413,7 +475,11 @@ def main() -> None:
+         )
+ 
+     elif args.command == "benchmark":
+-        ids = list(DATASETS) if args.datasets == "all" else [args.datasets]
++        ids = (
++            list(DATASETS)
++            if args.datasets == "all"
++            else [args.datasets]
++        )
+         benchmark(
+             ids,
+             epochs=args.epochs,

@@ -100,37 +100,6 @@ DATASETS: Dict[str, Dict[str, Any]] = {
     },
 }
 
-
-# ---------------------------------------------------------------------------
-# Extended workstation benchmark catalog
-#
-# The original DATASETS entries remain untouched.  These additional datasets
-# use the same generic CSV -> numeric target -> sequence-window pipeline.
-# Entries whose URL is unavailable are skipped by `catalog`; benchmark only
-# runs datasets that have successfully downloaded.
-# ---------------------------------------------------------------------------
-
-EXTENDED_DATASETS: Dict[str, Dict[str, Any]] = {
-    "air_passengers": {
-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/air_passengers.csv",
-        "filename": "air_passengers.csv",
-        "target": None,
-        "description": "Monthly air passengers",
-    },
-    "fuel_consumption": {
-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/consumos-combustibles-mensual.csv",
-        "filename": "fuel_consumption.csv",
-        "target": None,
-        "description": "Monthly fuel consumption",
-    },
-    "h2o_extended": {
-        "url": "https://raw.githubusercontent.com/skforecast/skforecast-datasets/main/data/h2o.csv",
-        "filename": "h2o_extended.csv",
-        "target": None,
-        "description": "Australian health expenditure",
-    },
-}
-
 TARGET_ALIASES = {
     "h2o": ["y", "value", "x", "h2o"],
     "fuel_consumption": ["Consumo", "consumo", "value"],
@@ -381,47 +350,12 @@ def benchmark(
     return results
 
 
-
-def all_dataset_catalog() -> dict[str, dict[str, Any]]:
-    """Return the complete workstation dataset catalog."""
-    catalog: dict[str, dict[str, Any]] = {}
-    for dataset_id, cfg in DATASETS.items():
-        catalog[dataset_id] = dict(cfg, source="core")
-    for dataset_id, cfg in EXTENDED_DATASETS.items():
-        catalog.setdefault(dataset_id, dict(cfg, source="extended"))
-    return catalog
-
-
-def catalog() -> list[dict[str, Any]]:
-    """Print a machine-readable dataset catalog."""
-    rows = []
-    for dataset_id, cfg in all_dataset_catalog().items():
-        rows.append({
-            "dataset_id": dataset_id,
-            "description": cfg.get("description", ""),
-            "target": cfg.get("target"),
-            "filename": cfg.get("filename"),
-            "source": cfg.get("source", "core"),
-            "url": cfg.get("url"),
-        })
-    print(json.dumps(rows, indent=2, ensure_ascii=False))
-    return rows
-
-
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(
-        description="HE-ML workstation dataset/training/inference tool"
-    )
+    p = argparse.ArgumentParser(description="HE-ML workstation dataset/training/inference tool")
     sub = p.add_subparsers(dest="command", required=True)
 
-    c = sub.add_parser("catalog", help="Show workstation dataset catalog")
-
     d = sub.add_parser("download")
-    d.add_argument(
-        "--dataset",
-        choices=list(DATASETS) + ["all"],
-        default="all",
-    )
+    d.add_argument("--dataset", choices=list(DATASETS) + ["all"], default="all")
     d.add_argument("--force", action="store_true")
 
     t = sub.add_parser("train")
@@ -434,21 +368,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     i = sub.add_parser("infer")
     i.add_argument("--dataset", choices=list(DATASETS), required=True)
-    i.add_argument(
-        "--scheme",
-        choices=["ckks", "bfv", "tfhe", "paillier"],
-        default="ckks",
-    )
+    i.add_argument("--scheme", choices=["ckks", "bfv", "tfhe", "paillier"], default="ckks")
     i.add_argument("--target")
     i.add_argument("--seq-len", type=int, default=24)
     i.add_argument("--max-points", type=int, default=3000)
 
     b = sub.add_parser("benchmark")
-    b.add_argument(
-        "--datasets",
-        choices=list(DATASETS) + ["all"],
-        default="all",
-    )
+    b.add_argument("--datasets", choices=list(DATASETS) + ["all"], default="all")
     b.add_argument("--seq-len", type=int, default=24)
     b.add_argument("--epochs", type=int, default=3)
     b.add_argument("--lr", type=float, default=0.01)
@@ -456,14 +382,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     return p
 
+
 def main() -> None:
     args = build_parser().parse_args()
     ensure_dirs()
 
-    if args.command == "catalog":
-        catalog()
-
-    elif args.command == "download":
+    if args.command == "download":
         if args.dataset == "all":
             download_all(force=args.force)
         else:
@@ -489,11 +413,7 @@ def main() -> None:
         )
 
     elif args.command == "benchmark":
-        ids = (
-            list(DATASETS)
-            if args.datasets == "all"
-            else [args.datasets]
-        )
+        ids = list(DATASETS) if args.datasets == "all" else [args.datasets]
         benchmark(
             ids,
             epochs=args.epochs,

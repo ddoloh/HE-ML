@@ -20,7 +20,6 @@ from multi_scheme_he import (
     CPUParallelInferenceEngine
 )
 from cpu_models_pkg import MobileNetV3Lite, MiniLMQuantized, LightGBMCPU
-from workstation_train import all_dataset_catalog
 
 app = FastAPI(
     title="Multi-Scheme HE & CPU AI Engine (Production Enterprise Edition)",
@@ -61,26 +60,6 @@ async def serve_dashboard(request: Request):
     request=request,
     name="index.html",
     context={"request": request})
-
-
-@app.get("/api/v1/workstation/catalog")
-async def workstation_catalog():
-    """Return the workstation benchmark dataset catalog."""
-    catalog = all_dataset_catalog()
-    return {
-        "status": "success",
-        "count": len(catalog),
-        "datasets": [
-            {
-                "dataset_id": dataset_id,
-                "description": cfg.get("description", ""),
-                "target": cfg.get("target"),
-                "source": cfg.get("source", "core"),
-            }
-            for dataset_id, cfg in catalog.items()
-        ],
-    }
-
 
 @app.get("/api/v1/health")
 async def health_check():
